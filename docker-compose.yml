@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  opmanager:
+    build: .
+    container_name: manageengine-opmanager
+    ports:
+      - "8060:8060"
+      - "8443:8443"
+    volumes:
+      - opmanager_mysql:/opt/ManageEngine/OpManager/Mysql
+      - opmanager_conf:/opt/ManageEngine/OpManager/conf
+      - opmanager_logs:/opt/ManageEngine/OpManager/logs
+      - opmanager_pgbackup:/opt/ManageEngine/OpManager/pgbackup
+    environment:
+      - JAVA_OPTS=-Xms2g -Xmx4g
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8060 || exit 1"]
+      interval: 1m
+      timeout: 10s
+      retries: 3
+      start_period: 5m
+    restart: unless-stopped
+    ulimits:
+      nofile: 65536 65536
+
+volumes:
+  opmanager_mysql:
+  opmanager_conf:
+  opmanager_logs:
+  opmanager_pgbackup:
